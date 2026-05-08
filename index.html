@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3D2B24">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Veil Studio">
+<link rel="manifest" href="manifest.json">
+<title>The Veil – Content Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F4;
+  --blush: #E8D5C9;
+  --rose: #C4937A;
+  --deep: #3D2B24;
+  --muted: #7A6158;
+  --white: #FFFFFF;
+  --shadow: rgba(61,43,36,0.08);
+  --green: #7FAF7F;
+  --s-idea: #C4937A;
+  --s-draft: #D4A847;
+  --s-ready: #7A9FC4;
+  --s-posted: #7FAF7F;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--cream); color:var(--deep); font-family:'Jost',sans-serif; font-weight:300; min-height:100vh; }
+
+/* ── HEADER ── */
+header { background:var(--deep); padding:20px 40px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.logo { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:300; letter-spacing:6px; color:var(--cream); text-transform:uppercase; }
+.logo span { color:var(--rose); }
+.header-right { display:flex; align-items:center; gap:20px; }
+.api-status { font-size:11px; letter-spacing:2px; color:var(--blush); text-transform:uppercase; display:flex; align-items:center; gap:6px; }
+.api-dot { width:6px; height:6px; border-radius:50%; background:#666; }
+.api-dot.ok { background:var(--green); }
+
+/* ── TABS ── */
+.tabs { display:flex; background:var(--deep); border-bottom:1px solid rgba(255,255,255,0.08); padding:0 40px; }
+.tab { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(250,247,244,0.45); padding:14px 0; margin-right:32px; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; font-family:'Jost',sans-serif; font-weight:400; background:none; border-top:none; border-left:none; border-right:none; }
+.tab:hover { color:var(--blush); }
+.tab.active { color:var(--cream); border-bottom-color:var(--rose); }
+
+/* ── VIEWS ── */
+.view { display:none; }
+.view.active { display:block; }
+
+/* ── SETTINGS BAR ── */
+.settings-bar { background:var(--white); border-bottom:1px solid var(--blush); padding:14px 40px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+.settings-bar label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+.settings-bar input, .settings-bar select { background:var(--cream); border:1px solid var(--blush); border-radius:3px; padding:8px 12px; font-family:'Jost',sans-serif; font-size:13px; font-weight:300; color:var(--deep); outline:none; transition:border-color .2s; }
+.settings-bar input:focus, .settings-bar select:focus { border-color:var(--rose); }
+.settings-bar input[type="password"] { width:220px; }
+.sep { width:1px; height:28px; background:var(--blush); }
+
+/* ── GENERATOR VIEW ── */
+.gen-main { max-width:1100px; margin:0 auto; padding:40px 24px; }
+.card { background:var(--white); border:1px solid var(--blush); border-radius:4px; padding:32px 36px; margin-bottom:32px; box-shadow:0 4px 24px var(--shadow); }
+.card-title { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--rose); margin-bottom:8px; }
+.card h2 { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; margin-bottom:6px; }
+.card > p { color:var(--muted); font-size:13px; margin-bottom:24px; line-height:1.6; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.form-group { display:flex; flex-direction:column; gap:7px; }
+.form-group.full { grid-column:1/-1; }
+.form-group label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+.form-group input, .form-group textarea, .form-group select { background:var(--cream); border:1px solid var(--blush); border-radius:3px; padding:11px 14px; font-family:'Jost',sans-serif; font-size:13px; font-weight:300; color:var(--deep); outline:none; transition:border-color .2s; resize:vertical; }
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus { border-color:var(--rose); }
+.form-group textarea { min-height:80px; }
+.platform-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+.ptoggle { display:flex; align-items:center; gap:7px; padding:9px 16px; border:1px solid var(--blush); border-radius:3px; cursor:pointer; font-size:12px; letter-spacing:1px; color:var(--muted); transition:all .2s; user-select:none; background:var(--cream); font-family:'Jost',sans-serif; }
+.ptoggle.active { background:var(--deep); border-color:var(--deep); color:var(--cream); }
+.btn-primary { background:var(--deep); color:var(--cream); border:none; border-radius:3px; padding:14px 36px; font-family:'Jost',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:10px; }
+.btn-primary:hover { background:var(--rose); }
+.btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+.btn-secondary { background:transparent; border:1px solid var(--blush); border-radius:3px; padding:9px 18px; font-family:'Jost',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all .2s; }
+.btn-secondary:hover { border-color:var(--rose); color:var(--rose); }
+.btn-secondary.copied { border-color:var(--green); color:var(--green); }
+.spinner { width:14px; height:14px; border:2px solid rgba(250,247,244,.3); border-top-color:var(--cream); border-radius:50%; animation:spin .8s linear infinite; display:none; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.results-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.post-card { background:var(--white); border:1px solid var(--blush); border-radius:4px; overflow:hidden; box-shadow:0 4px 20px var(--shadow); animation:fadeUp .4s ease forwards; opacity:0; }
+.post-card:nth-child(2){animation-delay:.1s}.post-card:nth-child(3){animation-delay:.2s}.post-card:nth-child(4){animation-delay:.3s}
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.post-head { background:var(--deep); padding:12px 18px; display:flex; align-items:center; justify-content:space-between; }
+.post-platform { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--cream); display:flex; align-items:center; gap:8px; }
+.post-meta-label { font-size:10px; color:var(--blush); opacity:.7; }
+.post-body { padding:18px 22px; }
+.post-content { font-size:13px; line-height:1.8; color:var(--deep); white-space:pre-wrap; min-height:70px; }
+.post-tags { margin-top:12px; display:flex; flex-wrap:wrap; gap:5px; }
+.tag { background:var(--cream); border:1px solid var(--blush); border-radius:2px; padding:3px 9px; font-size:10px; color:var(--rose); letter-spacing:.5px; }
+.post-foot { padding:12px 22px; border-top:1px solid var(--blush); display:flex; gap:8px; justify-content:flex-end; }
+.loading-state { display:none; align-items:center; justify-content:center; gap:14px; padding:48px; grid-column:1/-1; color:var(--muted); font-size:12px; letter-spacing:2px; text-transform:uppercase; }
+.dots { display:flex; gap:5px; }
+.dots span { width:5px; height:5px; background:var(--rose); border-radius:50%; animation:bounce 1.2s ease infinite; }
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce { 0%,80%,100%{transform:scale(.8);opacity:.5} 40%{transform:scale(1.2);opacity:1} }
+.error-box { background:#FFF0EE; border:1px solid #E8B4AA; border-radius:3px; padding:18px 22px; color:#A0483A; font-size:13px; line-height:1.6; display:none; grid-column:1/-1; }
+
+/* ── PLANNER VIEW ── */
+.planner-main { max-width:1300px; margin:0 auto; padding:32px 24px; }
+.planner-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
+.planner-top h1 { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:300; }
+.planner-controls { display:flex; align-items:center; gap:12px; }
+.month-nav { display:flex; align-items:center; gap:12px; }
+.month-nav button { background:none; border:1px solid var(--blush); border-radius:3px; width:32px; height:32px; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.month-nav button:hover { border-color:var(--rose); color:var(--rose); }
+.month-label { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; min-width:200px; text-align:center; }
+
+/* Legend */
+.legend { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); letter-spacing:.5px; }
+.legend-dot { width:8px; height:8px; border-radius:50%; }
+
+/* Calendar grid */
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--blush); border:1px solid var(--blush); border-radius:4px; overflow:hidden; }
+.cal-head { background:var(--deep); padding:10px 0; text-align:center; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--cream); }
+.cal-day { background:var(--white); min-height:130px; padding:8px; position:relative; cursor:pointer; transition:background .15s; }
+.cal-day:hover { background:#FFFAF8; }
+.cal-day.other-month { background:var(--cream); }
+.cal-day.other-month .day-num { color:var(--blush); }
+.cal-day.today { background:#FFF8F5; }
+.cal-day.today .day-num { color:var(--rose); font-weight:500; }
+.day-num { font-size:12px; font-weight:400; color:var(--muted); margin-bottom:6px; }
+.day-event-badge { font-size:9px; letter-spacing:.5px; text-transform:uppercase; color:var(--rose); margin-bottom:4px; font-weight:500; }
+.post-chip { border-radius:3px; padding:4px 7px; margin-bottom:4px; font-size:10px; line-height:1.4; cursor:pointer; transition:opacity .15s; position:relative; }
+.post-chip:hover { opacity:.85; }
+.post-chip .chip-platform { font-size:9px; opacity:.8; margin-right:3px; }
+.post-chip .chip-title { font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; max-width:100%; }
+.post-chip[data-status="idea"] { background:#F9EDE6; color:#8B4F2C; border-left:3px solid var(--s-idea); }
+.post-chip[data-status="draft"] { background:#FBF4E0; color:#7A5A10; border-left:3px solid var(--s-draft); }
+.post-chip[data-status="ready"] { background:#E6EFF9; color:#2A5080; border-left:3px solid var(--s-ready); }
+.post-chip[data-status="posted"] { background:#EAF4EA; color:#2E5E2E; border-left:3px solid var(--s-posted); }
+.add-post-btn { font-size:18px; color:var(--blush); line-height:1; cursor:pointer; position:absolute; top:8px; right:8px; transition:color .15s; background:none; border:none; }
+.add-post-btn:hover { color:var(--rose); }
+.ai-plan-btn { background:var(--rose); color:var(--white); border:none; border-radius:3px; padding:10px 22px; font-family:'Jost',sans-serif; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; cursor:pointer; transition:background .2s; display:flex; align-items:center; gap:8px; }
+.ai-plan-btn:hover { background:var(--deep); }
+.ai-plan-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* ── MODAL ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(61,43,36,.5); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--white); border-radius:6px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(61,43,36,.25); animation:modalIn .25s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+.modal-head { background:var(--deep); padding:20px 24px; display:flex; align-items:center; justify-content:space-between; border-radius:6px 6px 0 0; }
+.modal-head h3 { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300; color:var(--cream); }
+.modal-close { background:none; border:none; color:var(--blush); font-size:22px; cursor:pointer; line-height:1; }
+.modal-body { padding:24px; }
+.modal-body .form-group { margin-bottom:16px; }
+.modal-body .form-group label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:6px; }
+.modal-body input,.modal-body textarea,.modal-body select { width:100%; background:var(--cream); border:1px solid var(--blush); border-radius:3px; padding:10px 14px; font-family:'Jost',sans-serif; font-size:13px; font-weight:300; color:var(--deep); outline:none; transition:border-color .2s; resize:vertical; }
+.modal-body input:focus,.modal-body textarea:focus,.modal-body select:focus { border-color:var(--rose); }
+.modal-body textarea { min-height:100px; }
+.status-row { display:flex; gap:8px; flex-wrap:wrap; }
+.status-btn { padding:7px 14px; border-radius:3px; font-size:11px; letter-spacing:1px; cursor:pointer; border:2px solid transparent; font-family:'Jost',sans-serif; transition:all .2s; }
+.status-btn[data-s="idea"] { background:#F9EDE6; color:#8B4F2C; }
+.status-btn[data-s="draft"] { background:#FBF4E0; color:#7A5A10; }
+.status-btn[data-s="ready"] { background:#E6EFF9; color:#2A5080; }
+.status-btn[data-s="posted"] { background:#EAF4EA; color:#2E5E2E; }
+.status-btn.active { border-color:var(--deep); }
+.modal-foot { padding:16px 24px; border-top:1px solid var(--blush); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.btn-danger { background:transparent; border:1px solid #E8B4AA; border-radius:3px; padding:9px 16px; font-family:'Jost',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#A0483A; cursor:pointer; transition:all .2s; }
+.btn-danger:hover { background:#FFF0EE; }
+.gen-from-plan-btn { background:var(--rose); color:var(--white); border:none; border-radius:3px; padding:10px 18px; font-family:'Jost',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:background .2s; }
+.gen-from-plan-btn:hover { background:var(--deep); }
+
+/* AI plan progress */
+.ai-progress { background:var(--white); border:1px solid var(--blush); border-radius:4px; padding:24px; margin-bottom:24px; display:none; }
+.ai-progress-bar-wrap { background:var(--blush); border-radius:99px; height:4px; margin-top:12px; }
+.ai-progress-bar { background:var(--rose); height:4px; border-radius:99px; transition:width .4s ease; width:0%; }
+.ai-progress-text { font-size:12px; color:var(--muted); letter-spacing:1px; margin-top:8px; }
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--deep); border-top:1px solid rgba(255,255,255,0.1); z-index:150; padding-bottom:env(safe-area-inset-bottom); }
+.bottom-nav-inner { display:flex; }
+.bottom-nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 8px; background:none; border:none; cursor:pointer; font-family:'Jost',sans-serif; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(250,247,244,0.45); transition:color .2s; }
+.bottom-nav-btn.active { color:var(--rose); }
+.bottom-nav-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.5; }
+
+/* ── MOBILE SETTINGS SHEET ── */
+.mobile-settings-btn { display:none; background:none; border:none; color:var(--blush); cursor:pointer; padding:4px; }
+.mobile-settings-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.5; }
+.settings-sheet { position:fixed; inset:0; z-index:300; display:none; }
+.settings-sheet.open { display:block; }
+.settings-sheet-bg { position:absolute; inset:0; background:rgba(61,43,36,.5); }
+.settings-sheet-panel { position:absolute; bottom:0; left:0; right:0; background:var(--white); border-radius:16px 16px 0 0; padding:20px 24px calc(24px + env(safe-area-inset-bottom)); animation:slideUp .3s ease; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.sheet-handle { width:36px; height:4px; background:var(--blush); border-radius:99px; margin:0 auto 20px; }
+.sheet-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:300; margin-bottom:16px; }
+.sheet-field { margin-bottom:14px; }
+.sheet-field label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:6px; }
+.sheet-field input, .sheet-field select { width:100%; background:var(--cream); border:1px solid var(--blush); border-radius:8px; padding:13px 14px; font-family:'Jost',sans-serif; font-size:16px; font-weight:300; color:var(--deep); outline:none; -webkit-appearance:none; }
+.sheet-field input:focus, .sheet-field select:focus { border-color:var(--rose); }
+
+@media(max-width:700px){
+  /* Layout */
+  body { padding-bottom:70px; }
+  header { padding:14px 16px; }
+  .tabs { display:none; }
+  .settings-bar { display:none; }
+  .bottom-nav { display:block; }
+  .mobile-settings-btn { display:block; }
+
+  /* Generator */
+  .gen-main { padding:16px 14px; }
+  .card { padding:20px 18px; margin-bottom:20px; }
+  .card h2 { font-size:22px; }
+  .form-row { grid-template-columns:1fr; gap:12px; margin-bottom:12px; }
+  .form-group input, .form-group textarea, .form-group select { font-size:16px; padding:13px 14px; border-radius:8px; -webkit-appearance:none; }
+  .form-group textarea { min-height:100px; }
+  .ptoggle { padding:10px 14px; font-size:13px; flex:1; min-width:calc(50% - 5px); justify-content:center; }
+  .platform-row { gap:8px; }
+  .btn-primary { width:100%; justify-content:center; padding:16px; font-size:12px; border-radius:8px; }
+  .results-grid { grid-template-columns:1fr; gap:14px; }
+  .post-foot { flex-wrap:wrap; }
+  .post-foot .btn-secondary { flex:1; text-align:center; }
+
+  /* Planner */
+  .planner-main { padding:14px 12px; }
+  .planner-top { flex-direction:column; align-items:stretch; gap:12px; margin-bottom:16px; }
+  .planner-top h1 { font-size:24px; }
+  .planner-controls { flex-wrap:wrap; gap:10px; justify-content:space-between; }
+  .legend { display:none; }
+  .month-label { font-size:18px; min-width:160px; }
+  .ai-plan-btn { flex:1; justify-content:center; padding:12px 16px; border-radius:8px; }
+  .cal-head { font-size:9px; letter-spacing:1px; padding:8px 0; }
+  .cal-day { min-height:72px; padding:5px 4px; }
+  .day-num { font-size:11px; margin-bottom:3px; }
+  .day-event-badge { font-size:8px; letter-spacing:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .post-chip { padding:3px 5px; font-size:9px; }
+  .post-chip .chip-platform { display:none; }
+  .add-post-btn { font-size:14px; top:4px; right:3px; }
+
+  /* Event Manager */
+  .event-manager { padding:18px 16px; }
+  .event-add-row { flex-direction:column; }
+  .event-add-row input, .event-add-row select { width:100%; border-radius:8px; font-size:16px; padding:12px 14px; -webkit-appearance:none; }
+  .event-add-row .btn-primary { width:100%; justify-content:center; }
+  .event-row { flex-wrap:wrap; gap:6px; }
+  .event-row-type { display:none; }
+
+  /* Modal */
+  .modal-overlay { padding:0; align-items:flex-end; }
+  .modal { border-radius:16px 16px 0 0; max-height:92vh; padding-bottom:env(safe-area-inset-bottom); }
+  .modal-body input, .modal-body textarea, .modal-body select { font-size:16px; border-radius:8px; padding:13px 14px; -webkit-appearance:none; }
+  .modal-foot { flex-wrap:wrap; gap:8px; }
+  .modal-foot .btn-primary, .modal-foot .gen-from-plan-btn { flex:1; text-align:center; justify-content:center; border-radius:8px; padding:14px; }
+
+  /* AI Progress */
+  .ai-progress { padding:16px; }
+}
+
+@media(min-width:701px) and (max-width:900px){
+  .results-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .cal-day{min-height:90px}
+  header{padding:16px 20px}
+  .tabs{padding:0 20px}
+  .settings-bar{padding:12px 20px}
+  .gen-main,.planner-main{padding:24px 16px}
+}
+
+/* ── DRAG & DROP ── */
+.cal-day.drag-over { background:#FFF0E8; outline:2px dashed var(--rose); outline-offset:-3px; }
+.post-chip[draggable] { cursor:grab; }
+.post-chip.dragging { opacity:0.4; cursor:grabbing; }
+
+/* ── EVENT MANAGER ── */
+.event-manager { background:var(--white); border:1px solid var(--blush); border-radius:4px; padding:28px 32px; margin-bottom:28px; box-shadow:0 4px 24px var(--shadow); }
+.event-manager h3 { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300; margin-bottom:4px; }
+.event-manager p { font-size:13px; color:var(--muted); margin-bottom:20px; }
+.event-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; max-height:240px; overflow-y:auto; }
+.event-row { display:flex; align-items:center; gap:10px; background:var(--cream); border:1px solid var(--blush); border-radius:3px; padding:10px 14px; }
+.event-row-date { font-size:12px; font-weight:500; color:var(--rose); min-width:80px; letter-spacing:.5px; }
+.event-row-label { font-size:13px; color:var(--deep); flex:1; }
+.event-row-type { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); background:var(--blush); padding:3px 8px; border-radius:2px; }
+.event-row-del { background:none; border:none; color:var(--blush); cursor:pointer; font-size:18px; line-height:1; padding:0 4px; transition:color .15s; }
+.event-row-del:hover { color:#A0483A; }
+.event-add-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.event-add-row input[type="date"], .event-add-row input[type="text"], .event-add-row select { background:var(--cream); border:1px solid var(--blush); border-radius:3px; padding:9px 12px; font-family:'Jost',sans-serif; font-size:13px; font-weight:300; color:var(--deep); outline:none; transition:border-color .2s; }
+.event-add-row input[type="date"]:focus,.event-add-row input[type="text"]:focus,.event-add-row select:focus { border-color:var(--rose); }
+.event-add-row input[type="text"] { flex:1; min-width:160px; }
+
+/* ── DRAG HANDLE in modal ── */
+.drag-hint { font-size:11px; color:var(--muted); letter-spacing:.5px; margin-top:6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">The <span>Veil</span> <span style="font-size:13px;letter-spacing:2px;color:var(--blush);font-family:'Jost',sans-serif;font-weight:300"> Studio</span></div>
+  <div class="header-right">
+    <div class="api-status"><div class="api-dot" id="apiDot"></div><span id="apiStatusText">Kein Key</span></div>
+    <button class="mobile-settings-btn" onclick="openSettingsSheet()" title="Einstellungen">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ── BOTTOM NAV ── -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-btn active" id="bnav-generator" onclick="switchTabMobile('generator')">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Generator
+    </button>
+    <button class="bottom-nav-btn" id="bnav-planner" onclick="switchTabMobile('planner')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Planer
+    </button>
+  </div>
+</nav>
+
+<!-- ── MOBILE SETTINGS SHEET ── -->
+<div class="settings-sheet" id="settingsSheet">
+  <div class="settings-sheet-bg" onclick="closeSettingsSheet()"></div>
+  <div class="settings-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Einstellungen</div>
+    <div class="sheet-field">
+      <label>Google Gemini API Key</label>
+      <input type="password" id="apiKeyMobile" placeholder="AIza..." autocomplete="off">
+    </div>
+    <div class="sheet-field">
+      <label>Modell</label>
+      <select id="modelSelectMobile">
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash – 250/Tag</option>
+        <option value="gemini-2.5-flash-lite-preview-06-17">Flash-Lite – 1000/Tag</option>
+        <option value="gemini-2.5-pro">Gemini 2.5 Pro – 100/Tag</option>
+      </select>
+    </div>
+    <div id="mobileUsageInfo" style="font-size:12px;color:var(--muted);margin-bottom:20px;letter-spacing:.5px"></div>
+    <button class="btn-primary" onclick="saveSettingsSheet()" style="width:100%;justify-content:center;border-radius:8px;padding:16px">Speichern</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('generator')">✦ Post Generator</button>
+  <button class="tab" onclick="switchTab('planner')">◈ Content-Planer</button>
+</div>
+
+<!-- Settings Bar -->
+<div class="settings-bar">
+  <label>API Key</label>
+  <input type="password" id="apiKey" placeholder="AIza..." style="width:210px">
+  <div class="sep"></div>
+  <label>Modell</label>
+  <select id="modelSelect" style="min-width:200px">
+    <option value="gemini-2.5-flash">Gemini 2.5 Flash (250/Tag)</option>
+    <option value="gemini-2.5-flash-lite-preview-06-17">Gemini 2.5 Flash-Lite (1000/Tag)</option>
+    <option value="gemini-2.5-pro">Gemini 2.5 Pro (100/Tag)</option>
+  </select>
+  <div class="sep"></div>
+  <span id="usageCounter" style="font-size:11px;color:var(--muted);letter-spacing:1px"></span>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 1: GENERATOR
+═══════════════════════════════════════════ -->
+<div id="view-generator" class="view active">
+<div class="gen-main">
+  <div class="card">
+    <p class="card-title">✦ KI-Assistent</p>
+    <h2>Post Generator</h2>
+    <p>Beschreibe deine Idee – der Assistent erstellt passende Posts für alle ausgewählten Plattformen.</p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Posting-Typ</label>
+        <select id="contentType">
+          <option value="organisch">Organischer Post</option>
+          <option value="produktvorstellung">Produktvorstellung / Kleid</option>
+          <option value="angebot">Angebot / Aktion</option>
+          <option value="tipp">Braut-Tipp / Ratgeber</option>
+          <option value="hinter-den-kulissen">Behind the Scenes</option>
+          <option value="kundenstory">Kundenstory / Testimonial</option>
+          <option value="messe">Messe / Event</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tone of Voice</label>
+        <select id="tone">
+          <option value="warm-inspirierend">Warm &amp; Inspirierend</option>
+          <option value="professionell-elegant">Professionell &amp; Elegant</option>
+          <option value="locker-persönlich">Locker &amp; Persönlich</option>
+          <option value="emotional-berührend">Emotional &amp; Berührend</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group full" style="margin-bottom:18px">
+      <label>Deine Idee / Thema</label>
+      <textarea id="idea" placeholder="z.B. Neue Stella York Kollektion ist eingetroffen – romantische Spitze, Boho-Stil..."></textarea>
+    </div>
+
+    <div style="margin-bottom:8px"><label style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Plattformen</label></div>
+    <div class="platform-row">
+      <button class="ptoggle active" data-p="instagram">📸 Instagram</button>
+      <button class="ptoggle active" data-p="tiktok">🎵 TikTok</button>
+      <button class="ptoggle active" data-p="facebook">💙 Facebook</button>
+      <button class="ptoggle active" data-p="google">🔍 Google</button>
+    </div>
+
+    <button class="btn-primary" id="genBtn" onclick="generatePosts()">
+      <div class="spinner" id="genSpinner"></div>
+      <span id="genBtnText">Posts generieren</span>
+    </button>
+  </div>
+
+  <div id="genResults" style="display:none">
+    <div class="results-grid" id="resultsGrid"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TAB 2: PLANNER
+═══════════════════════════════════════════ -->
+<div id="view-planner" class="view">
+<div class="planner-main">
+
+  <div class="planner-top">
+    <div>
+      <p style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--rose);margin-bottom:6px">◈ Content-Planung</p>
+      <h1>Monatsübersicht</h1>
+    </div>
+    <div class="planner-controls">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s-idea)"></div>Idee</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s-draft)"></div>Entwurf</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s-ready)"></div>Fertig</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--s-posted)"></div>Gepostet</div>
+      </div>
+      <div style="width:1px;height:28px;background:var(--blush)"></div>
+      <div class="month-nav">
+        <button onclick="changeMonth(-1)">‹</button>
+        <div class="month-label" id="monthLabel"></div>
+        <button onclick="changeMonth(1)">›</button>
+      </div>
+      <button class="ai-plan-btn" id="aiPlanBtn" onclick="generateAIPlan()">
+        <div class="spinner" id="planSpinner" style="border-top-color:#fff"></div>
+        <span id="aiPlanBtnText">✦ KI-Monatsplan</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="ai-progress" id="aiProgress">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)" id="progressLabel">Erstelle Monatsplan…</span>
+    </div>
+    <div class="ai-progress-bar-wrap"><div class="ai-progress-bar" id="progressBar"></div></div>
+    <div class="ai-progress-text" id="progressText">Gemini analysiert Events und Themen…</div>
+  </div>
+
+
+  <!-- ── EIGENE EVENTS ── -->
+  <div class="event-manager" id="eventManager">
+    <p class="card-title" style="font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:6px">◈ Eigene Events</p>
+    <h3>Events &amp; Termine verwalten</h3>
+    <p>Trage eigene Termine, Messen oder Aktionen ein – sie erscheinen dann automatisch im Kalender.</p>
+    <div class="event-list" id="eventList"></div>
+    <div class="event-add-row">
+      <input type="date" id="newEventDate" placeholder="Datum">
+      <input type="text" id="newEventLabel" placeholder="Bezeichnung (z.B. Herbstkollektion Launch)">
+      <select id="newEventType">
+        <option value="event">📅 Termin</option>
+        <option value="messe">🏛️ Messe</option>
+        <option value="aktion">🎀 Aktion</option>
+        <option value="kollektion">👗 Kollektion</option>
+        <option value="sonstiges">✦ Sonstiges</option>
+      </select>
+      <button class="btn-primary" onclick="addCustomEvent()" style="padding:9px 18px;font-size:10px">+ Hinzufügen</button>
+    </div>
+  </div>
+
+  <div class="cal-grid" id="calGrid"></div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: Post bearbeiten / erstellen
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+<div class="modal">
+  <div class="modal-head">
+    <h3 id="modalTitle">Post erstellen</h3>
+    <button class="modal-close" onclick="closeModal()">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Datum <span style="font-weight:300;font-size:10px;color:var(--muted);letter-spacing:0;text-transform:none">– oder Post im Kalender per Drag &amp; Drop verschieben</span></label>
+      <input type="date" id="mDate">
+    </div>
+    <div class="form-group">
+      <label>Thema / Titel</label>
+      <input type="text" id="mTitle" placeholder="z.B. Neue Kollektion Frühjahr">
+    </div>
+    <div class="form-group">
+      <label>Plattform</label>
+      <select id="mPlatform">
+        <option value="instagram">📸 Instagram</option>
+        <option value="tiktok">🎵 TikTok</option>
+        <option value="facebook">💙 Facebook</option>
+        <option value="google">🔍 Google Business</option>
+        <option value="alle">📣 Alle Plattformen</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <div class="status-row">
+        <button type="button" class="status-btn active" data-s="idea" onclick="setStatus('idea')">Idee</button>
+        <button type="button" class="status-btn" data-s="draft" onclick="setStatus('draft')">Entwurf</button>
+        <button type="button" class="status-btn" data-s="ready" onclick="setStatus('ready')">Fertig</button>
+        <button type="button" class="status-btn" data-s="posted" onclick="setStatus('posted')">Gepostet</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notiz / Post-Text</label>
+      <textarea id="mNote" placeholder="Optionaler Post-Text oder Notiz…" style="min-height:80px"></textarea>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn-danger" id="deleteBtn" onclick="deletePost()" style="display:none">Löschen</button>
+    <div style="display:flex;gap:10px;margin-left:auto">
+      <button class="gen-from-plan-btn" onclick="generateFromPlan()">✦ Posts generieren</button>
+      <button class="btn-primary" onclick="savePost()" style="padding:10px 20px">Speichern</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// PLATFORM CONFIG
+// ─────────────────────────────────────────────
+const PINFO = {
+  instagram:{ icon:'📸', name:'Instagram', meta:'Reels Caption / Feed',
+    fmt:'Emotional, 150–220 Wörter, Emojis, 5–8 Hashtags am Ende, CTA zu Story/Bio-Link.' },
+  tiktok:{ icon:'🎵', name:'TikTok', meta:'Video Caption',
+    fmt:'Max 80 Wörter, erste Zeile Hook/Cliffhanger, 3–5 TikTok-Hashtags, CTA.' },
+  facebook:{ icon:'💙', name:'Facebook', meta:'Facebook Post',
+    fmt:'Warm, 120–180 Wörter, persönliche Ansprache, 2–3 dezente Hashtags, CTA.' },
+  google:{ icon:'🔍', name:'Google Business', meta:'Google Post',
+    fmt:'Professionell, max 150 Wörter, keine Hashtags, Keywords Aachen/Alsdorf/NRW, CTA.' }
+};
+
+// ── Osterdatum nach Gauß'scher Formel berechnen ──
+function getEasterDate(year) {
+  const a = year % 19, b = Math.floor(year/100), c = year % 100;
+  const d = Math.floor(b/4), e = b % 4, f = Math.floor((b+8)/25);
+  const g = Math.floor((b-f+1)/3), h = (19*a+b-d-g+15) % 30;
+  const i = Math.floor(c/4), k = c % 4;
+  const l = (32+2*e+2*i-h-k) % 7;
+  const m = Math.floor((a+11*h+22*l)/451);
+  const month = Math.floor((h+l-7*m+114)/31);
+  const day = ((h+l-7*m+114) % 31) + 1;
+  return new Date(year, month-1, day);
+}
+
+// ── Zweiter Sonntag im Mai (Muttertag) ──
+function getMothersDay(year) {
+  const d = new Date(year, 4, 1);
+  const dow = d.getDay(); // 0=So
+  const firstSun = dow === 0 ? 1 : 8 - dow;
+  return new Date(year, 4, firstSun + 7);
+}
+
+// ── EBW Datum per Jahr-Lookup (Messe Essen, jährlich variabel) ──
+function getLastSaturdayOfMarch(year) {
+  // Bekannte Termine: 2025=29.März, 2026=28.März, 2027=3.April
+  const known = { 2024:[4,13], 2025:[3,29], 2026:[3,28], 2027:[4,3], 2028:[3,30] };
+  if (known[year]) {
+    const [m,d] = known[year];
+    return new Date(year, m-1, d);
+  }
+  // Fallback: letzter Samstag im März
+  let d = new Date(year, 2, 31);
+  while (d.getDay() !== 6) d.setDate(d.getDate() - 1);
+  return d;
+}
+
+// ── Events für ein gegebenes Jahr zusammenstellen ──
+function getEventsForYear(year) {
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+  const easter = getEasterDate(year);
+  const karfreitag = new Date(easter); karfreitag.setDate(easter.getDate()-2);
+  const ostersamstag = new Date(easter); ostersamstag.setDate(easter.getDate()-1);
+  const ostermontag = new Date(easter); ostermontag.setDate(easter.getDate()+1);
+  const himmelfahrt = new Date(easter); himmelfahrt.setDate(easter.getDate()+39);
+  const pfingstsonntag = new Date(easter); pfingstsonntag.setDate(easter.getDate()+49);
+  const pfingstmontag = new Date(easter); pfingstmontag.setDate(easter.getDate()+50);
+  const fronleichnam = new Date(easter); fronleichnam.setDate(easter.getDate()+60);
+  const muttertag = getMothersDay(year);
+
+  // EBW: letzter Samstag im März
+  const ebwSat = getLastSaturdayOfMarch(year);
+  const ebwSun = new Date(ebwSat); ebwSun.setDate(ebwSat.getDate()+1);
+  const ebwMon = new Date(ebwSat); ebwMon.setDate(ebwSat.getDate()+2);
+
+  return {
+    '01-01': 'Neujahr 🎉',
+    '02-14': 'Valentinstag 💕',
+    [fmt(karfreitag)]: 'Karfreitag',
+    [fmt(ostersamstag)]: 'Ostersamstag 🐣',
+    [fmt(easter)]: 'Ostersonntag 🐣',
+    [fmt(ostermontag)]: 'Ostermontag 🐣',
+    '05-01': 'Tag der Arbeit',
+    [fmt(muttertag)]: 'Muttertag 🌸',
+    [fmt(himmelfahrt)]: 'Christi Himmelfahrt / Vatertag',
+    [fmt(pfingstsonntag)]: 'Pfingstsonntag 🕊️',
+    [fmt(pfingstmontag)]: 'Pfingstmontag 🕊️',
+    [fmt(fronleichnam)]: 'Fronleichnam',
+    [fmt(ebwSat)]: 'European Bridal Week – Tag 1 ✨',
+    [fmt(ebwSun)]: 'European Bridal Week – Tag 2 ✨',
+    [fmt(ebwMon)]: 'European Bridal Week – Tag 3 ✨',
+    '08-15': 'Mariä Himmelfahrt',
+    '10-03': 'Tag der Deutschen Einheit',
+    '10-19': 'Hochzeitsmesse Aachen',
+    '11-01': 'Allerheiligen',
+    '12-24': 'Heiligabend 🎄',
+    '12-25': '1. Weihnachtstag 🎄',
+    '12-26': '2. Weihnachtstag 🎄',
+    '12-31': 'Silvester 🥂',
+  };
+}
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let posts = JSON.parse(localStorage.getItem('veil_posts') || '[]');
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+let editingId = null;
+let currentStatus = 'idea';
+
+function savePosts() { localStorage.setItem('veil_posts', JSON.stringify(posts)); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ─────────────────────────────────────────────
+// API KEY / SETTINGS
+// ─────────────────────────────────────────────
+function getKey() { return document.getElementById('apiKey').value.trim(); }
+function getModel() {
+  const saved = localStorage.getItem('veil_model');
+  const sel = document.getElementById('modelSelect');
+  return (sel && sel.value) || saved || 'gemini-2.5-flash';
+}
+
+function updateApiStatus() {
+  const k = getKey();
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiStatusText');
+  if (k && k.startsWith('AIza')) {
+    dot.className = 'api-dot ok'; txt.textContent = 'Gemini verbunden';
+  } else {
+    dot.className = 'api-dot'; txt.textContent = 'Kein Key';
+  }
+}
+
+function getUsageToday() {
+  const d = new Date().toDateString();
+  const s = JSON.parse(localStorage.getItem('veil_usage') || '{}');
+  return s.date === d ? (s.count||0) : 0;
+}
+function incUsage() {
+  const d = new Date().toDateString();
+  const c = getUsageToday() + 1;
+  localStorage.setItem('veil_usage', JSON.stringify({date:d, count:c}));
+  updateUsageCounter();
+}
+function updateUsageCounter() {
+  const c = getUsageToday();
+  const limits = {'gemini-2.5-flash':250,'gemini-2.5-flash-lite-preview-06-17':1000,'gemini-2.5-pro':100};
+  const lim = limits[getModel()]||250;
+  document.getElementById('usageCounter').textContent = c > 0 ? `Heute: ${c} / ~${lim} Anfragen` : '';
+}
+
+// ─────────────────────────────────────────────
+// TAB SWITCHING
+// ─────────────────────────────────────────────
+// switchTab wird unten neu definiert
+
+// ─────────────────────────────────────────────
+// PLATFORM TOGGLES (Generator)
+// ─────────────────────────────────────────────
+document.querySelectorAll('.ptoggle').forEach(b=>{
+  b.addEventListener('click',()=>b.classList.toggle('active'));
+});
+function getActivePlatforms() {
+  return [...document.querySelectorAll('.ptoggle.active')].map(b=>b.dataset.p);
+}
+
+// ─────────────────────────────────────────────
+// GEMINI API CALL
+// ─────────────────────────────────────────────
+async function callGemini(prompt, maxTokens=8192) {
+  const key = getKey();
+  if (!key) throw new Error('Bitte API Key eintragen (oben in der Leiste).');
+  const model = getModel();
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+    { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{ temperature:0.85, maxOutputTokens:maxTokens, responseMimeType:'application/json' }
+      })
+    }
+  );
+  if (!resp.ok) {
+    const e = await resp.json();
+    if (resp.status===429) throw new Error('Tageslimit erreicht – morgen wieder verfügbar oder auf Flash-Lite wechseln.');
+    if (resp.status===400) throw new Error('API Key ungültig. Bitte auf aistudio.google.com prüfen.');
+    throw new Error(e.error?.message || `API Fehler ${resp.status}`);
+  }
+  const data = await resp.json();
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!raw) throw new Error('Keine Antwort erhalten. Bitte erneut versuchen.');
+  let clean = raw.replace(/```json|```/g,'').trim();
+  const a = clean.indexOf('['), b = clean.lastIndexOf(']');
+  if (a!==-1&&b!==-1) clean = clean.substring(a,b+1);
+  try { return JSON.parse(clean); }
+  catch(pe) { throw new Error('Antwort konnte nicht verarbeitet werden – bitte erneut versuchen.'); }
+}
+
+// ─────────────────────────────────────────────
+// GENERATOR
+// ─────────────────────────────────────────────
+async function generatePosts() {
+  const idea = document.getElementById('idea').value.trim();
+  const ctype = document.getElementById('contentType').value;
+  const tone = document.getElementById('tone').value;
+  const platforms = getActivePlatforms();
+  if (!idea) return alert('Bitte eine Idee beschreiben.');
+  if (!platforms.length) return alert('Bitte mindestens eine Plattform auswählen.');
+  if (!getKey()) return alert('Bitte API Key in der Leiste oben eintragen.');
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  document.getElementById('genSpinner').style.display='block';
+  document.getElementById('genBtnText').textContent='Wird erstellt…';
+
+  const grid = document.getElementById('resultsGrid');
+  document.getElementById('genResults').style.display='block';
+  grid.innerHTML=`<div class="loading-state" style="display:flex"><div class="dots"><span></span><span></span><span></span></div>Gemini erstellt deine Posts…</div>`;
+
+  const pfmt = platforms.map(p=>`**${PINFO[p].name}:** ${PINFO[p].fmt}`).join('\n');
+  const prompt = `Du bist Social Media Assistent von "The Veil", romantische Brautboutique in Alsdorf bei Aachen. Inhaberin: Alina Toporowski. Brand Voice: ${tone}, herzlich, elegant, wie eine beste Freundin mit Brautmode-Expertise. Website: veilstore.de
+Posting-Typ: ${ctype}. Ton: ${tone}. Idee: ${idea}
+Erstelle Posts für: ${pfmt}
+Antworte NUR als JSON-Array: [{"platform":"instagram","content":"...","hashtags":["#tag1"]},...]
+Hashtags nur für Instagram und TikTok. Google: keine Hashtags.`;
+
+  try {
+    const result = await callGemini(prompt);
+    incUsage();
+    grid.innerHTML='';
+    result.forEach((post,i)=>{
+      const p = PINFO[post.platform]||{icon:'📣',name:post.platform,meta:''};
+      const tags = post.hashtags?.length
+        ? `<div class="post-tags">${post.hashtags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : '';
+      const card = document.createElement('div');
+      card.className='post-card';
+      card.innerHTML=`
+        <div class="post-head"><div class="post-platform"><span>${p.icon}</span>${p.name}</div><div class="post-meta-label">${p.meta}</div></div>
+        <div class="post-body"><div class="post-content" id="pc${i}">${post.content}</div>${tags}</div>
+        <div class="post-foot">
+          <button class="btn-secondary" onclick="copyText('pc${i}',this)">Kopieren</button>
+          <button class="btn-secondary" onclick="copyWithTags('pc${i}',${JSON.stringify(post.hashtags||[])},this)">+ Hashtags</button>
+        </div>`;
+      grid.appendChild(card);
+    });
+  } catch(err) {
+    grid.innerHTML=`<div class="error-box" style="display:block">⚠️ <strong>Fehler:</strong> ${err.message}</div>`;
+  }
+  btn.disabled=false;
+  document.getElementById('genSpinner').style.display='none';
+  document.getElementById('genBtnText').textContent='Posts generieren';
+}
+
+function copyText(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    btn.textContent='✓ Kopiert'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Kopieren'; btn.classList.remove('copied'); },2000);
+  });
+}
+function copyWithTags(id, tags, btn) {
+  const t = document.getElementById(id).textContent;
+  const full = tags.length ? `${t}\n\n${tags.join(' ')}` : t;
+  navigator.clipboard.writeText(full).then(()=>{
+    btn.textContent='✓ Kopiert'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='+ Hashtags'; btn.classList.remove('copied'); },2000);
+  });
+}
+
+
+// ─────────────────────────────────────────────
+// CUSTOM EVENTS
+// ─────────────────────────────────────────────
+let customEvents = JSON.parse(localStorage.getItem('veil_custom_events') || '[]');
+
+function saveCustomEvents() { localStorage.setItem('veil_custom_events', JSON.stringify(customEvents)); }
+
+const EVENT_TYPE_ICONS = { event:'📅', messe:'🏛️', aktion:'🎀', kollektion:'👗', sonstiges:'✦' };
+
+function renderEventList() {
+  const list = document.getElementById('eventList');
+  if (!customEvents.length) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:12px 0;text-align:center;letter-spacing:.5px">Noch keine eigenen Events eingetragen</div>';
+    return;
+  }
+  const sorted = [...customEvents].sort((a,b)=>a.date.localeCompare(b.date));
+  list.innerHTML = sorted.map(ev => {
+    const d = new Date(ev.date + 'T00:00:00');
+    const dateLabel = d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const icon = EVENT_TYPE_ICONS[ev.type] || '✦';
+    return `<div class="event-row">
+      <span class="event-row-date">${dateLabel}</span>
+      <span class="event-row-label">${icon} ${ev.label}</span>
+      <span class="event-row-type">${ev.type}</span>
+      <button class="event-row-del" onclick="deleteCustomEvent('${ev.id}')" title="Löschen">×</button>
+    </div>`;
+  }).join('');
+}
+
+function addCustomEvent() {
+  const date = document.getElementById('newEventDate').value;
+  const label = document.getElementById('newEventLabel').value.trim();
+  const type = document.getElementById('newEventType').value;
+  if (!date) return alert('Bitte ein Datum auswählen.');
+  if (!label) return alert('Bitte eine Bezeichnung eingeben.');
+  customEvents.push({ id: genId(), date, label, type });
+  saveCustomEvents();
+  document.getElementById('newEventDate').value = '';
+  document.getElementById('newEventLabel').value = '';
+  renderEventList();
+  renderCalendar();
+}
+
+function deleteCustomEvent(id) {
+  customEvents = customEvents.filter(e=>e.id!==id);
+  saveCustomEvents();
+  renderEventList();
+  renderCalendar();
+}
+
+function getCustomEventsForDate(dateStr) {
+  return customEvents.filter(e=>e.date===dateStr);
+}
+
+
+// ─────────────────────────────────────────────
+// DRAG & DROP
+// ─────────────────────────────────────────────
+let dragPostId = null;
+
+function onChipDragStart(e, postId) {
+  dragPostId = postId;
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+}
+
+function onChipDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.cal-day.drag-over').forEach(d=>d.classList.remove('drag-over'));
+}
+
+function onDayDragOver(e, dateStr) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.cal-day.drag-over').forEach(d=>d.classList.remove('drag-over'));
+  const day = document.querySelector(`.cal-day[data-date="${dateStr}"]`);
+  if (day) day.classList.add('drag-over');
+}
+
+function onDayDrop(e, dateStr) {
+  e.preventDefault();
+  document.querySelectorAll('.cal-day.drag-over').forEach(d=>d.classList.remove('drag-over'));
+  if (!dragPostId) return;
+  const idx = posts.findIndex(p=>p.id===dragPostId);
+  if (idx > -1) {
+    posts[idx].date = dateStr;
+    savePosts();
+    renderCalendar();
+    // Kurzes visuelles Feedback
+    setTimeout(()=>{
+      const chip = document.querySelector(`.post-chip[data-id="${dragPostId}"]`);
+      if (chip) { chip.style.outline='2px solid var(--rose)'; setTimeout(()=>chip.style.outline='',600); }
+    },50);
+  }
+  dragPostId = null;
+}
+
+// ─────────────────────────────────────────────
+// CALENDAR
+// ─────────────────────────────────────────────
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  const days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+  const monthNames = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+  document.getElementById('monthLabel').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+  grid.innerHTML = days.map(d=>`<div class="cal-head">${d}</div>`).join('');
+
+  const first = new Date(currentYear, currentMonth, 1);
+  let startDow = first.getDay(); // 0=So
+  startDow = startDow === 0 ? 6 : startDow - 1; // Mo=0
+
+  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+  const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
+  const today = new Date();
+
+  for (let i=0; i<startDow; i++) {
+    const d = daysInPrev - startDow + i + 1;
+    grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  for (let d=1; d<=daysInMonth; d++) {
+    const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear()===currentYear && today.getMonth()===currentMonth && today.getDate()===d;
+    const mmdd = `${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const yearEvents = getEventsForYear(currentYear);
+    const eventLabel = yearEvents[mmdd] ? `<div class="day-event-badge">✦ ${yearEvents[mmdd]}</div>` : '';
+    const dayPosts = posts.filter(p=>p.date===dateStr);
+    const chips = dayPosts.map(p=>`
+      <div class="post-chip" data-status="${p.status}" data-id="${p.id}"
+        draggable="true"
+        ondragstart="onChipDragStart(event,'${p.id}')"
+        ondragend="onChipDragEnd(event)"
+        onclick="openModal('${p.id}')" title="${p.title}">
+        <span class="chip-platform">${(PINFO[p.platform]||{icon:'📣'}).icon}</span>
+        <span class="chip-title">${p.title}</span>
+      </div>`).join('');
+
+    const customDayEvents = getCustomEventsForDate(dateStr);
+    const customBadges = customDayEvents.map(ev=>`<div class="day-event-badge" style="color:var(--muted)">◈ ${EVENT_TYPE_ICONS[ev.type]||'✦'} ${ev.label}</div>`).join('');
+
+    grid.innerHTML += `<div class="cal-day${isToday?' today':''}" data-date="${dateStr}"
+      ondragover="onDayDragOver(event,'${dateStr}')"
+      ondrop="onDayDrop(event,'${dateStr}')">
+      <div class="day-num">${d}</div>
+      ${eventLabel}
+      ${customBadges}
+      ${chips}
+      <button class="add-post-btn" onclick="openNewModal('${dateStr}')">+</button>
+    </div>`;
+  }
+
+  const totalCells = startDow + daysInMonth;
+  const remaining = Math.ceil(totalCells/7)*7 - totalCells;
+  for (let i=1; i<=remaining; i++) {
+    grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
+  }
+}
+
+function changeMonth(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth=0; currentYear++; }
+  if (currentMonth < 0) { currentMonth=11; currentYear--; }
+  renderCalendar();
+}
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+function openNewModal(date) {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Post erstellen';
+  document.getElementById('mDate').value = date;
+  document.getElementById('mTitle').value = '';
+  document.getElementById('mPlatform').value = 'instagram';
+  document.getElementById('mNote').value = '';
+  document.getElementById('deleteBtn').style.display = 'none';
+  setStatus('idea');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function openModal(id) {
+  const p = posts.find(x=>x.id===id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Post bearbeiten';
+  document.getElementById('mDate').value = p.date;
+  document.getElementById('mTitle').value = p.title;
+  document.getElementById('mPlatform').value = p.platform;
+  document.getElementById('mNote').value = p.note||'';
+  document.getElementById('deleteBtn').style.display = 'block';
+  setStatus(p.status);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOnBg(e) { if (e.target===document.getElementById('modalOverlay')) closeModal(); }
+
+function setStatus(s) {
+  currentStatus = s;
+  document.querySelectorAll('.status-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.s===s);
+  });
+}
+
+function savePost() {
+  const title = document.getElementById('mTitle').value.trim();
+  if (!title) return alert('Bitte einen Titel eingeben.');
+  const post = {
+    id: editingId || genId(),
+    date: document.getElementById('mDate').value,
+    title, platform: document.getElementById('mPlatform').value,
+    status: currentStatus,
+    note: document.getElementById('mNote').value
+  };
+  if (editingId) {
+    const idx = posts.findIndex(p=>p.id===editingId);
+    if (idx>-1) posts[idx]=post;
+  } else {
+    posts.push(post);
+  }
+  savePosts(); closeModal(); renderCalendar();
+}
+
+function deletePost() {
+  if (!editingId) return;
+  if (!confirm('Post wirklich löschen?')) return;
+  posts = posts.filter(p=>p.id!==editingId);
+  savePosts(); closeModal(); renderCalendar();
+}
+
+// ─────────────────────────────────────────────
+// GENERATE FROM PLAN (Modal → Generator Tab)
+// ─────────────────────────────────────────────
+function generateFromPlan() {
+  const title = document.getElementById('mTitle').value.trim();
+  const note = document.getElementById('mNote').value.trim();
+  const plat = document.getElementById('mPlatform').value;
+  if (!title) return alert('Bitte zuerst einen Titel eingeben.');
+  closeModal();
+  switchTabDirect('generator');
+  document.getElementById('idea').value = note ? `${title}: ${note}` : title;
+  if (plat !== 'alle') {
+    document.querySelectorAll('.ptoggle').forEach(b=>{
+      b.classList.toggle('active', b.dataset.p===plat);
+    });
+  } else {
+    document.querySelectorAll('.ptoggle').forEach(b=>b.classList.add('active'));
+  }
+  document.getElementById('idea').scrollIntoView({behavior:'smooth'});
+}
+
+function switchTabDirect(name) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.tab')[name==='generator'?0:1].classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// AI MONTH PLAN
+// ─────────────────────────────────────────────
+async function generateAIPlan() {
+  if (!getKey()) return alert('Bitte API Key eintragen.');
+  if (!confirm(`Soll Gemini einen kompletten Monatsplan für ${getMonthName()} erstellen? Vorhandene Posts bleiben erhalten.`)) return;
+
+  const btn = document.getElementById('aiPlanBtn');
+  btn.disabled=true;
+  document.getElementById('planSpinner').style.display='block';
+  document.getElementById('aiPlanBtnText').textContent='Erstellt…';
+
+  const prog = document.getElementById('aiProgress');
+  prog.style.display='block';
+  const bar = document.getElementById('progressBar');
+  const progText = document.getElementById('progressText');
+
+  const steps = [
+    [10,'Analysiere Events und Feiertage…'],
+    [30,'Plane Content-Mix für den Monat…'],
+    [60,'Erstelle Themen und Plattform-Zuordnungen…'],
+    [85,'Finalisiere Monatsplan…'],
+    [100,'Plan fertig!']
+  ];
+  let si=0;
+  const progInterval = setInterval(()=>{
+    if(si<steps.length-1){ bar.style.width=steps[si][0]+'%'; progText.textContent=steps[si][1]; si++; }
+  },800);
+
+  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+  const monthName = getMonthName();
+
+  // Sammle Events des Monats
+  const monthEvents = [];
+  for (let d=1; d<=daysInMonth; d++) {
+    const mmdd = `${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evY = getEventsForYear(currentYear);
+    if (evY[mmdd]) monthEvents.push(`${d}. ${monthName}: ${evY[mmdd]}`);
+  }
+
+  const prompt = `Du planst den Social Media Content-Kalender für "The Veil", Brautboutique in Alsdorf/Aachen von Alina Toporowski.
+Monat: ${monthName} ${currentYear}. Posting-Frequenz: täglich (7x/Woche).
+Bekannte Events diesen Monat: ${monthEvents.length ? monthEvents.join(', ') : 'Keine besonderen Events'}.
+Zielgruppe: Bräute 22–40 Jahre, Region Aachen/NRW.
+Erstelle für JEDEN Tag von 1 bis ${daysInMonth} einen Post-Vorschlag. Variiere die Plattformen und Post-Typen sinnvoll.
+Post-Typen: produktvorstellung, tipp, behind-the-scenes, kundenstory, organisch, messe, angebot.
+Plattformen: instagram, tiktok, facebook, google.
+Berücksichtige Events mit passendem Content (Valentinstag→romantisch, Muttertag→emotional, etc.).
+Antworte NUR als JSON-Array mit ${daysInMonth} Einträgen:
+[{"day":1,"title":"Kurzer Titel max 6 Wörter","platform":"instagram","type":"produktvorstellung","note":"Kurze Idee max 15 Wörter"},...]`;
+
+  try {
+    const result = await callGemini(prompt, 8192);
+    clearInterval(progInterval);
+    bar.style.width='100%';
+    progText.textContent='Plan erstellt – wird eingetragen…';
+    incUsage();
+
+    // Posts eintragen (nur neue Tage, keine Überschreibung)
+    const existingDates = new Set(posts.map(p=>p.date));
+    result.forEach(item=>{
+      const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(item.day).padStart(2,'0')}`;
+      if (!existingDates.has(dateStr)) {
+        posts.push({
+          id: genId(),
+          date: dateStr,
+          title: item.title || 'Post-Idee',
+          platform: item.platform || 'instagram',
+          status: 'idea',
+          note: item.note || ''
+        });
+      }
+    });
+    savePosts();
+    setTimeout(()=>{ prog.style.display='none'; bar.style.width='0%'; renderCalendar(); },800);
+  } catch(err) {
+    clearInterval(progInterval);
+    alert('Fehler: ' + err.message);
+    prog.style.display='none';
+  }
+  btn.disabled=false;
+  document.getElementById('planSpinner').style.display='none';
+  document.getElementById('aiPlanBtnText').textContent='✦ KI-Monatsplan';
+}
+
+function getMonthName() {
+  const m=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  return m[currentMonth];
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+// ── MOBILE TAB SWITCH ──
+function switchTabMobile(name) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-'+name)?.classList.add('active');
+  // Desktop tabs sync
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab')[name==='generator'?0:1]?.classList.add('active');
+  if (name==='planner') renderCalendar();
+}
+
+// ── SETTINGS SHEET (Mobile) ──
+function openSettingsSheet() {
+  const k = localStorage.getItem('veil_gemini_apikey') || '';
+  document.getElementById('apiKeyMobile').value = k;
+  const model = localStorage.getItem('veil_model') || 'gemini-2.5-flash';
+  document.getElementById('modelSelectMobile').value = model;
+  const c = getUsageToday();
+  document.getElementById('mobileUsageInfo').textContent = c > 0 ? `Heute genutzt: ${c} Anfragen` : '';
+  document.getElementById('settingsSheet').classList.add('open');
+}
+function closeSettingsSheet() {
+  document.getElementById('settingsSheet').classList.remove('open');
+}
+function saveSettingsSheet() {
+  const k = document.getElementById('apiKeyMobile').value.trim();
+  const m = document.getElementById('modelSelectMobile').value;
+  if (k) {
+    localStorage.setItem('veil_gemini_apikey', k);
+    document.getElementById('apiKey').value = k;
+  }
+  localStorage.setItem('veil_model', m);
+  document.getElementById('modelSelect').value = m;
+  updateApiStatus();
+  updateUsageCounter();
+  closeSettingsSheet();
+}
+
+// ── DESKTOP TAB OVERRIDE: sync bottom nav ──
+function switchTab(name) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-'+name)?.classList.add('active');
+  if (name==='planner') renderCalendar();
+}
+
+window.addEventListener('load',()=>{
+  const k = localStorage.getItem('veil_gemini_apikey');
+  if (k) {
+    document.getElementById('apiKey').value = k;
+    if (document.getElementById('apiKeyMobile')) document.getElementById('apiKeyMobile').value = k;
+  }
+  const m = localStorage.getItem('veil_model');
+  if (m) {
+    document.getElementById('modelSelect').value = m;
+    if (document.getElementById('modelSelectMobile')) document.getElementById('modelSelectMobile').value = m;
+  }
+  updateApiStatus();
+  updateUsageCounter();
+  renderCalendar();
+  renderEventList();
+});
+document.getElementById('apiKey').addEventListener('input',()=>{
+  const k = getKey();
+  if (k) localStorage.setItem('veil_gemini_apikey', k);
+  updateApiStatus();
+});
+</script>
+</body>
+</html>
